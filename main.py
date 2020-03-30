@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication,QDialog
 from serialMonitor_ui import *
 from SerialThreadClass import *
 from Packet_Tokenizer import *
+import matplotlib.pyplot as plt
 
 ports = [
     p.device
@@ -23,6 +24,10 @@ class MainClass(QDialog):
         self.myserial.start()
         self.parser = Packet_Tokenizer()
         self.parser.assign_key(['nodeId','temp','humidity','pressure','latitude','longitude'])
+        self.fig1 = plt.figure()
+        self.ax = self.fig1.add_subplot(1,1,1)
+        self.ax.plot([1,2,4])
+        print(type(self.fig1))
         self.show()
 
     def intrepret_packet(self,packet):
@@ -32,7 +37,7 @@ class MainClass(QDialog):
         
 
     def btnClickedEvent(self):
-        self.myserial.sendSerial()
+        self.myserial.sendSerial(b'test')
         print('Pressing') 
 
 if __name__ == "__main__":
