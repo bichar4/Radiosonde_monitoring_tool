@@ -1,31 +1,24 @@
-import serial,serial.tools.list_ports
+import serial
 from PyQt5.QtCore import pyqtSignal, QThread
 
-ports = [
-    p.device
-    for p in serial.tools.list_ports.comports()
-    if 'USB' in p.description
-]
 
-if not ports:
-    raise IOError("No devices found")
+#if not ports:
+#   raise IOError("No devices found")
 
 class SerialThreadClass(QThread):
     message = pyqtSignal(str)
     
-    def __init__(self,parent=None):
+    def __init__(self,parent=None,port = '/dev/ttyUSB0', baudrate = 9600):
         super(SerialThreadClass,self).__init__(parent)
         self.serialport = serial.Serial()
-        self.serialport.baudrate = 9600
-        if ports:
-            self.serialport.port = ports[0]
-            self.serialport.open()
-    
+        self.serialport.baudrate = baudrate
+        self.serialport.port = port
+        self.serialport.open()
+
     def run(self):
         while True:
             msg = self.serialport.readline()
-            self.message.emit(str(msg))
-            print(msg)
+            self.message.emit(msg.decode('utf-8'))
     
     def sendSerial(self,message):
         self.serialport.write(message)
