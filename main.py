@@ -4,7 +4,8 @@ from PyQt5.QtWidgets import QApplication,QDialog
 from serialMonitor_ui import *
 from SerialThreadClass import *
 from Packet_Tokenizer import *
-import matplotlib.pyplot as plt
+import random
+from PlotCanvas import * 
 
 ports = [
     p.device
@@ -24,16 +25,17 @@ class MainClass(QDialog):
         self.myserial.start()
         self.parser = Packet_Tokenizer()
         self.parser.assign_key(['nodeId','temp','humidity','pressure','latitude','longitude'])
-        self.fig1 = plt.figure()
-        self.ax = self.fig1.add_subplot(1,1,1)
-        self.ax.plot([1,2,4])
-        print(type(self.fig1))
+        
+        self.m = PlotCanvas(self, width=5, height=4)
+        self.m.move(0,0)
         self.show()
 
     def intrepret_packet(self,packet):
         self.ui_Serial.SerialOutput.append(packet)
         self.parser.extractData(packet)
-        print(self.parser.getData())
+        value = self.parser.getData()['nodeId']
+        if value is not None:
+            self.m.updatePlot(int(value)+random.randint(1,10))
         
 
     def btnClickedEvent(self):

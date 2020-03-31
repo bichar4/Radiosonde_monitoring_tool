@@ -18,7 +18,10 @@ class SerialThreadClass(QThread):
     def run(self):
         while True:
             msg = self.serialport.readline()
-            self.message.emit(msg.decode('utf-8'))
+            try:
+                self.message.emit(str(msg.decode('utf-8')))
+            except:
+                pass
     
     def sendSerial(self,message):
         self.serialport.write(message)
