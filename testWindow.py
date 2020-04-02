@@ -26,8 +26,8 @@ class App(QMainWindow):
 
     def updatePlot(self):
         self.seconds+=1
-        self.m.updatePlot(self.seconds*self.seconds)
-        self.n.updatePlot(5*self.seconds + 1)
+        self.m.updatePlot(self.seconds*random.randint(-6,6))
+        self.n.updatePlot(5*self.seconds*random.randint(-4,4))
         
     def initUI(self):
         self.setWindowTitle(self.title)

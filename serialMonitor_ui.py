@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Serial(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(502, 547)
+        Dialog.resize(1002, 1047)
         self.SendButton = QtWidgets.QPushButton(Dialog)
         self.SendButton.setGeometry(QtCore.QRect(400, 20, 89, 25))
         self.SendButton.setObjectName("SendButton")

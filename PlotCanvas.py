@@ -3,7 +3,6 @@ import sys
 from PyQt5.QtWidgets import QSizePolicy
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import random 
@@ -22,7 +21,7 @@ class PlotCanvas(FigureCanvas):
         
 
     def plot(self):
-        self.axes.clear()
+        self.axes.cla()
         self.axes.plot(self.data)#for printing the recent 100 data only 
         self.draw()
         #print(self.axes.lines)
