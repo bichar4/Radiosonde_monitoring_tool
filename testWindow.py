@@ -1,50 +1,58 @@
-import sys
+import os
+import functools
+from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets, QtWebChannel
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QVBoxLayout, QSizePolicy, QMessageBox, QWidget, QPushButton
-from PyQt5.QtGui import QIcon
-from PyQt5 import QtCore
-import random
 
-from PlotCanvas import *
-
-class App(QMainWindow):
-
+class MainWindow(QtWidgets.QWidget):
     def __init__(self):
-        super().__init__()
-        self.left = 10
-        self.top = 10
-        self.title = 'PyQt5 matplotlib example - pythonspot.com'
-        self.width = 640*2
-        self.height = 400
-        self.m = PlotCanvas(self, width=5, height=4)
-        self.n = PlotCanvas(self,width=5,height = 4)
-        timer = QtCore.QTimer(self)
-        timer.timeout.connect(self.updatePlot)
-        timer.start(100)
-        self.seconds = 0
-        self.initUI()
+        super(MainWindow, self).__init__()
+        self.setupUi()
 
-    def updatePlot(self):
-        self.seconds+=1
-        self.m.updatePlot(self.seconds*random.randint(-6,6))
-        self.n.updatePlot(5*self.seconds*random.randint(-4,4))
-        
-    def initUI(self):
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
+    def setupUi(self):
+        # self.setFixedSize(800, 500)
+        vbox = QtWidgets.QVBoxLayout()
+        self.setLayout(vbox)
 
-      
-        self.m.move(0,0)
-        self.n.move(640,0)
+        label = self.label = QtWidgets.QLabel()
+        sp = QtWidgets.QSizePolicy()
+        sp.setVerticalStretch(0)
+        label.setSizePolicy(sp)
+        vbox.addWidget(label)
+        view = self.view = QtWebEngineWidgets.QWebEngineView()
+        channel = self.channel = QtWebChannel.QWebChannel()
 
-        button = QPushButton('PyQt5 button', self)
-        button.setToolTip('This s an example button')
-        button.move(500,0)
-        button.resize(140,100)
+        channel.registerObject("MainWindow", self)
+        view.page().setWebChannel(channel)
 
-        self.show()
+        file = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            "./map.html",
+        )
+        self.view.setUrl(QtCore.QUrl.fromLocalFile(file))
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = App()
+        vbox.addWidget(view)
+
+        button = QtWidgets.QPushButton("Go to Paris")
+        panToParis = functools.partial(self.panMap, 2.3272, 48.8620)
+        button.clicked.connect(panToParis)
+        vbox.addWidget(button)
+
+    @QtCore.pyqtSlot(float, float)
+    def onMapMove(self, lat, lng):
+        self.label.setText("Lng: {:.5f}, Lat: {:.5f}".format(lng, lat))
+    @QtCore.pyqtSlot(str)
+    def ontest(self,msg):
+        print('hello'+msg)
+
+    def panMap(self, lng, lat):
+        page = self.view.page()
+        page.runJavaScript("map.panTo(L.latLng({}, {}));".format(lat, lng))
+
+
+if __name__ == "__main__":
+    import sys
+
+    app = QtWidgets.QApplication(sys.argv)
+    w = MainWindow()
+    w.show()
     sys.exit(app.exec_())
